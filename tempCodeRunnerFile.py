@@ -1,1 +1,1 @@
-import pickle
+detector = MTCNN()
