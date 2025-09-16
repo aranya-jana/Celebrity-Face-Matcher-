@@ -1,4 +1,4 @@
-# import os
+import os
 import pickle
 
 # actors = os.listdir('DataSet')
@@ -13,7 +13,7 @@ import pickle
 
 
 import numpy as np
-# from tqdm import tqdm
+from tqdm import tqdm
 from tensorflow.keras.preprocessing import image                                               # type: ignore
 from tensorflow.keras.utils import get_source_inputs  # patched import                         # type: ignore
 from keras_vggface.vggface import VGGFace
@@ -27,3 +27,19 @@ model = VGGFace(model='resnet50', include_top=False, input_shape=(224,224,3), po
 
 # print(model.summary())
 
+# Feature extraction function
+def feature_extractor(img_path, model):
+    img = image.load_img(img_path, target_size=(224,224))
+    img_array = image.img_to_array(img)
+    expanded_img = np.expand_dims(img_array, axis=0)
+    preprocessed_img = preprocess_input(expanded_img)
+    result = model.predict(preprocessed_img).flatten()
+    return result
+
+# Extract features for all images
+features = []
+for file in tqdm(filenames):
+    features.append(feature_extractor(file, model))
+
+# Save features
+pickle.dump(features, open('embedding.pkl', 'wb'))
